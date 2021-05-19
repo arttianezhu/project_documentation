@@ -1,26 +1,29 @@
 # project_documentation
 
 ## Overview
-This doc walks through the process to setup the following basic topology with [XIA](https://github.com/XIA-Project/xia-core) Routers and [Picoquic](https://github.com/XIA-Project/picoquic) client and server programs.
+This doc walks through the process to setup the following basic topology with [XIA](https://github.com/XIA-Project/xia-core) Routers and [Picoquic](https://github.com/XIA-Project/picoquic) client and server programs. It is highly recommended for one to become familiar with the XIA project basics first; the "Overview of ASYNC Library" slides is a good reference.
 ![overview](diagrams/overview.png)
 
 More XIA project and Picoquic project documentations can be found in the [Documentations](#documentations) section.
-
-```
-TODO(tianez): rename and link Documentations
-```
 
 The setup above involves many configuration details, which will hopefully be made clearer here.
 
 ## Setup
 
-A number of VMs will be needed to host each of the entities, with the exception that the emulator stack's out of band configurator can be hosted anywhere to distribute configuration information "out-of-band". For the sake of simplicity, the Internet can be used instead of the XIA network (which in fact would not work since it's not yet communicating).
+A separate VM will be needed to host each of the entities, with the exception that the emulator stack's out of band configurator can be hosted anywhere to distribute configuration information "out-of-band". For the sake of simplicity, the Internet is used (as out-of-band) instead of the XIA network (which in fact would not work since it's not yet communicating).
 
 We assume the following setup
 ![vm](diagrams/vm.png)
 
 
 ### Interfaces
+
+The diagram below shows the basic setup. Each of the wires can be considered as a network. The blue ones together is the Internet, also the out of band communication medium. The other 3 are virtual wires. Each wire will be simulated using a virtual network.
+
+Conceptually, a strong connection can be drawn between the diagram below and the "Overlay Network Emulator Design" page in the "Overview of ASYNC Library" slides. The out of band configurator would correspond to the emulator controller. The Helper programs in the slides are incorporated into the router scripts or the client/server programs. Normally, when there is configuration for "Control IP/Port" in code, it corresponds to the emulator stack.
+
+Note that dynamic configuration for clients are also available. Each client can connect to multiple routers; configurations will be delivered by the emulation controller as well. Detailed configurations can be found in the client.conf files under e.g. `xia-core/tools/overlay`.
+
 
 ![detail](diagrams/detail.png)
 
@@ -39,10 +42,6 @@ A few other things to install: git, net-tools, build-essential, (text editor).
 ##### Github setup (team invitation)
 
 Developers must be invited to the correct Github team for the XIA project before proceeding; this is necessary for builds.
-
-```
-TODO(tianez): who should we contact for this?
-```
 
 ##### Github setup (SSH mode)
 
@@ -63,10 +62,6 @@ git checkout xia-v2-overlay
 make deps && make
 cd click/userlevel && make
 cd ../..
-```
-
-```
-TODO(tianez): to commit my fix
 ```
 
 Install python and the packages `twisted`, `service_identity` and `netifaces`.
@@ -235,6 +230,13 @@ Finally, run the configurator script on the VM with the out of band configuratio
 ```
 sudo python2 tools/overlay/xiaconfigurator.py
 ```
+
+The configuration order is as follows:
+- Configure routers (demo.conf)
+- Run events (events.conf)
+- Configure clients (client.conf)
+
+After configuration, the client and server program should communicate. We believe CID PUSH combination is used from between client/server programs and the XCaches. Details for address types can be found in the slides.
 
 ## Documentations
 
